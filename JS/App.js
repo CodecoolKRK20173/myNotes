@@ -1,18 +1,17 @@
 "use strict";
 
-// import {Controller} from "./Controller.js";
-// import {Model} from "./Model.js";
-// import {View} from "./View.js";
-
-// function main(){
-//     var model = new Model();
-//     var controller = new Controller(model);
-//     var view = new View(controller);
-//   }
-
-// main();
-
 const ol = document.querySelector('ol');
+const body = document.querySelector('body')
+
+let handleClear = function(){
+  localStorage.clear();
+}
+
+let clearBtn = document.createElement('input');
+  clearBtn.setAttribute('type', 'submit');
+  clearBtn.value = "Clear";
+  clearBtn.addEventListener("click", handleClear);
+  body.appendChild(clearBtn);
 
 document.getElementById("newNote").addEventListener("click", addNote);
 
@@ -79,7 +78,7 @@ let handleSaveClick = function () {
 
 }
 
-let liMaker = function (title, date, arrayIndex,notesToWeb) {
+let liMaker = function (title, date, arrayIndex, notesToWeb) {
   let editBtn = document.createElement('input');
   editBtn.setAttribute('type', 'submit');
   editBtn.value = "Edit";
@@ -97,24 +96,65 @@ let liMaker = function (title, date, arrayIndex,notesToWeb) {
   ol.appendChild(li);
 }
 
+let handleEditClick = function (arrayIndex) {
+  // read existing localStorage file
+  let notes = JSON.parse(localStorage.getItem("notes"));
+
+  let now = new Date();
+  let dateDay = now.getDate();
+  let dateMonth = now.getMonth() + 1;
+  let dateYear = now.getFullYear();
+  let noteDate = dateDay + "-" + dateMonth + "-" + dateYear;
+
+  let parent = document.getElementById('form-input');
+
+  let divInput = document.createElement('div');
+  divInput.setAttribute('class', 'form-group');
+  let input = document.createElement('input');
+  input.setAttribute('type', 'text', 'class', 'form-control', 'id', 'title'); // why adding multiple attributes don't work?
+  input.id = 'title';
+  input.value = notes[arrayIndex].title;
+  divInput.appendChild(input);
+
+  let divTextarea = document.createElement('div');
+  divTextarea.setAttribute('class', 'form-group');
+  let textArea = document.createElement('textarea');
+  textArea.setAttribute('class', 'form-control');
+  textArea.id = 'content';
+  textArea.value = notes[arrayIndex].noteContent;
+  divTextarea.appendChild(textArea);
+
+  // Save button logic - according to requirements it should be auto-save
+  let saveBtn = document.createElement('input');
+  saveBtn.setAttribute('type', 'submit');
+  saveBtn.value = "Save";
+  saveBtn.addEventListener("click", handleSaveClick);
+
+  parent.appendChild(divInput);
+  parent.appendChild(divTextarea);
+  parent.appendChild(saveBtn);
+}
+
 window.onload = event => {
   var notesToWeb = JSON.parse(localStorage.getItem("notes"));
   // debugger
   var arrayIndex = 0;
-  if (notesToWeb != null){
-    for (let i=0; i < notesToWeb.length; i++){
+  if (notesToWeb != null) {
+    for (let i = 0; i < notesToWeb.length; i++) {
       let noteTitle = notesToWeb[i].title;
-      let noteDate = notesToWeb[i].noteDate;  
+      let noteDate = notesToWeb[i].noteDate;
+
       arrayIndex = i;
       liMaker(noteTitle, noteDate, arrayIndex, notesToWeb);
     }
     // notesToWeb.forEach(note => {
     //   let noteTitle = note.title;
     //   let noteDate = note.noteDate;
-    
+
     //   liMaker(noteTitle, noteDate, arrayIndex);
     //   arrayIndex +=1;
     // });
+    
   }
 }
 
